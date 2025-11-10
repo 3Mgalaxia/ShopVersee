@@ -1,0 +1,17 @@
+{% section 'header' %}
+
+<section class="page-shell" id="inicio">
+  <main class="hero" aria-label="Boas-vindas ao ShopVersee">
+    <p class="badge">
+      {{ settings.hero_badge | default: 'Explorando o cosmos do e-commerce' }}
+    </p>
+    <h1>{{ settings.hero_headline | default: 'ShopVersee' }}</h1>
+    <p class="lead">
+      {{ settings.hero_copy | default: 'Uma nova experiência intergaláctica para conectar marcas e pessoas que vivem sem fronteiras.' }}
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="#inicio">Começar</a>
+      <a class="btn ghost" href="#sobre">Saber mais</a>
+    </div>
+  </main>
+</section>
