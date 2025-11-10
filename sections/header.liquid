@@ -1,3 +1,24 @@
-<div class="shopversee-header">
-  <h2>🚀 Bem-vindo à ShopVersee</h2>
-</div>
+<header class="shopversee-header" role="banner">
+  <a class="shopversee-header__brand" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+    {{ shop.name | default: 'ShopVersee' }}
+  </a>
+
+  <nav class="shopversee-header__nav" aria-label="Navegação principal">
+    <a href="#inicio">Início</a>
+    <a href="#banners">Banners</a>
+    <a href="#produtos">Produtos</a>
+    <a href="#conta">Conta</a>
+  </nav>
+
+  <a class="shopversee-header__account" href="{{ routes.account_url }}" aria-label="Área do cliente">
+    <img
+      src="{{ 'icon-account.svg' | asset_url }}"
+      alt=""
+      role="presentation"
+      width="20"
+      height="20"
+      loading="lazy"
+    >
+    <span>Minha conta</span>
+  </a>
+</header>

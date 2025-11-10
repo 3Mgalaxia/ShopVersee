@@ -10,8 +10,98 @@
       {{ settings.hero_copy | default: 'Uma nova experiência intergaláctica para conectar marcas e pessoas que vivem sem fronteiras.' }}
     </p>
     <div class="actions">
-      <a class="btn primary" href="#inicio">Começar</a>
-      <a class="btn ghost" href="#sobre">Saber mais</a>
+      <a class="btn primary" href="#produtos">Começar</a>
+      <a class="btn ghost" href="#banners">Saber mais</a>
     </div>
   </main>
+</section>
+
+<section id="banners" class="section-block">
+  <div class="section-block__header">
+    <p class="section-block__eyebrow">Campanhas em destaque</p>
+    <h2>Banner intergaláctico</h2>
+    <p class="section-block__lead">
+      Destaque coleções com chamadas rápidas. Substitua estas mensagens pelos banners reais da sua operação.
+    </p>
+  </div>
+  <div class="banner-grid">
+    <article class="banner-card banner-card--nova">
+      <p class="banner-card__eyebrow">Coleção Nebulosa</p>
+      <h3>Moda que brilha em qualquer órbita</h3>
+      <p>Peças metálicas e tecidos leves para quem vive em movimento.</p>
+      <a href="#produtos" class="btn ghost">Ver coleção</a>
+    </article>
+    <article class="banner-card banner-card--pulse">
+      <p class="banner-card__eyebrow">Tech essenciais</p>
+      <h3>Equipamentos com energia estelar</h3>
+      <p>Gadgets com inteligência artificial e autonomia prolongada.</p>
+      <a href="#produtos" class="btn primary">Comprar agora</a>
+    </article>
+  </div>
+</section>
+
+{% assign featured_collection = collections['frontpage'] %}
+<section id="produtos" class="section-block">
+  <div class="section-block__header">
+    <p class="section-block__eyebrow">Produtos em destaque</p>
+    <h2>Seleção ShopVersee</h2>
+  </div>
+  <div class="product-grid">
+    {% if featured_collection and featured_collection.products_count > 0 %}
+      {% for product in featured_collection.products limit: 4 %}
+        <article class="product-card">
+          <a class="product-card__media" href="{{ product.url }}">
+            {% if product.featured_image %}
+              {{ product.featured_image | image_url: width: 640 | image_tag: loading: 'lazy', alt: product.title }}
+            {% else %}
+              <span class="product-card__placeholder">Pré-visualização</span>
+            {% endif %}
+          </a>
+          <div class="product-card__body">
+            <a href="{{ product.url }}">
+              <h3>{{ product.title }}</h3>
+            </a>
+            <p class="product-card__price">{{ product.price | money }}</p>
+            <a class="btn ghost" href="{{ product.url }}">Ver detalhes</a>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      {% assign placeholders = 'Galaxy Backpack,Constelação Sneakers,Órbita Smartwatch,Zero-G Jacket' | split: ',' %}
+      {% for placeholder in placeholders %}
+        <article class="product-card product-card--placeholder">
+          <div class="product-card__media">
+            <span class="product-card__placeholder">{{ placeholder }}</span>
+          </div>
+          <div class="product-card__body">
+            <h3>{{ placeholder }}</h3>
+            <p class="product-card__price">R$ 000,00</p>
+            <span class="product-card__note">Substitua por um produto real</span>
+          </div>
+        </article>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+<section id="conta" class="section-block">
+  <div class="account-card">
+    <div class="account-card__media">
+      <img
+        src="{{ 'icon-account.svg' | asset_url }}"
+        alt="Ícone de conta"
+        width="48"
+        height="48"
+        loading="lazy"
+      >
+    </div>
+    <div class="account-card__body">
+      <h2>Gerencie sua conta</h2>
+      <p>Acompanhe pedidos, liste favoritos e atualize seus dados em um só lugar.</p>
+      <div class="actions">
+        <a class="btn primary" href="{{ routes.account_url }}">Entrar</a>
+        <a class="btn ghost" href="{{ routes.account_register_url }}">Criar conta</a>
+      </div>
+    </div>
+  </div>
 </section>
