@@ -1,0 +1,77 @@
+{% assign sorted_products = collection.products | sort: 'title' %}
+{% paginate sorted_products by 72 %}
+  {% section 'header' %}
+
+  <section class="collection-page">
+    <div class="collection-page__panel">
+      <p class="badge">Catálogo ShopVerse</p>
+      <h1>{{ collection.title | default: 'Todos os produtos' }}</h1>
+      {% if collection.description != blank %}
+        <p class="collection-page__description">{{ collection.description }}</p>
+      {% endif %}
+    </div>
+
+    {% if collection.products_count > 0 %}
+      <div class="collection-grid product-grid">
+        {% for product in paginate.items %}
+          <article class="product-card">
+            <a class="product-card__media" href="{{ product.url }}">
+              {% if product.featured_media %}
+                {{ product.featured_media | image_url: width: 640 | image_tag: loading: 'lazy', alt: product.title }}
+              {% else %}
+                <span class="product-card__placeholder">Pré-visualização</span>
+              {% endif %}
+            </a>
+            <div class="product-card__body">
+              <a href="{{ product.url }}">
+                <h3>{{ product.title }}</h3>
+              </a>
+              <p class="product-card__price">{{ product.price | money }}</p>
+              <p>Parcele em até 12x de {{ product.price | divided_by: 12.0 | money }}.</p>
+              <a class="btn ghost" href="{{ product.url }}">Ver detalhes</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class="collection-page__pagination">
+          <nav class="pagination" role="navigation" aria-label="Paginação de produtos">
+            <span class="pagination__item pagination__item--prev{% unless paginate.previous %} pagination__item--disabled{% endunless %}">
+              {% if paginate.previous %}
+                <a class="pagination__text" href="{{ paginate.previous.url }}">« Anterior</a>
+              {% else %}
+                <span class="pagination__text">« Anterior</span>
+              {% endif %}
+            </span>
+            <ul class="pagination__list">
+              {% for part in paginate.parts %}
+                {% if part.is_link %}
+                  <li class="pagination__item">
+                    <a href="{{ part.url }}">{{ part.title }}</a>
+                  </li>
+                {% else %}
+                  <li class="pagination__item {% if part.title == paginate.current_page %}pagination__item--current{% endif %}">
+                    <span class="pagination__text">{{ part.title }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+            <span class="pagination__item pagination__item--next{% unless paginate.next %} pagination__item--disabled{% endunless %}">
+              {% if paginate.next %}
+                <a class="pagination__text" href="{{ paginate.next.url }}">Avançar »</a>
+              {% else %}
+                <span class="pagination__text">Avançar »</span>
+              {% endif %}
+            </span>
+          </nav>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="collection-empty">
+        <p>Nenhum produto encontrado nesta coleção.</p>
+        <a class="btn primary" href="{{ routes.root_url }}">Voltar à página inicial</a>
+      </div>
+    {% endif %}
+  </section>
+{% endpaginate %}

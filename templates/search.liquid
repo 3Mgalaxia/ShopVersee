@@ -1,0 +1,79 @@
+{% assign query = search.terms %}
+{% paginate search.results by 24 %}
+  <section class="search-page">
+    <div class="search-page__panel">
+      <p class="badge">Busque na galáxia ShopVersee</p>
+      <h1>Resultados para <span>"{{ query | default: '...' }}"</span></h1>
+      <form class="search-page__form" action="{{ routes.search_url }}" method="get" role="search">
+        <label class="sr-only" for="search-page-input">Buscar produtos</label>
+        <input
+          id="search-page-input"
+          name="q"
+          type="search"
+          value="{{ query | escape }}"
+          placeholder="Busque por produtos, coleções ou palavras-chave"
+          autocomplete="off"
+        >
+        <input type="hidden" name="type" value="product">
+        <button type="submit">Procurar</button>
+      </form>
+      {% if search.performed %}
+        <p class="search-page__summary">
+          {{ search.results_count }} resultado{% if search.results_count != 1 %}s{% endif %} encontrados
+        </p>
+      {% else %}
+        <p class="search-page__summary">Digite algo para começar a explorar.</p>
+      {% endif %}
+    </div>
+
+    {% if search.performed %}
+      {% if search.results_count > 0 %}
+        <div class="search-results-grid">
+          {% for item in search.results %}
+            {% case item.object_type %}
+              {% when 'product' %}
+                <article class="search-card search-card--product">
+                  <a class="search-card__media" href="{{ item.url }}">
+                    {% if item.featured_media %}
+                      {{ item.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', alt: item.title }}
+                    {% else %}
+                      <span class="search-card__placeholder">Sem imagem</span>
+                    {% endif %}
+                  </a>
+                  <div class="search-card__body">
+                    <a href="{{ item.url }}"><h2>{{ item.title | highlight: search.terms }}</h2></a>
+                    <p class="search-card__price">{{ item.price | money }}</p>
+                    <p class="search-card__excerpt">
+                      {{ item.content | strip_html | truncate: 140 | highlight: search.terms }}
+                    </p>
+                    <a class="btn ghost" href="{{ item.url }}">Ver produto</a>
+                  </div>
+                </article>
+              {% else %}
+                <article class="search-card search-card--generic">
+                  <div class="search-card__body">
+                    <p class="search-card__eyebrow">{{ item.object_type | capitalize }}</p>
+                    <a href="{{ item.url }}"><h2>{{ item.title | highlight: search.terms }}</h2></a>
+                    <p class="search-card__excerpt">
+                      {{ item.content | strip_html | truncate: 150 | highlight: search.terms }}
+                    </p>
+                    <a class="btn ghost" href="{{ item.url }}">Abrir</a>
+                  </div>
+                </article>
+            {% endcase %}
+          {% endfor %}
+        </div>
+        {% if paginate.pages > 1 %}
+          <div class="search-page__pagination">
+            {{ paginate | default_pagination }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="search-page__empty">
+          <p>Nenhum resultado para "<strong>{{ query }}</strong>".</p>
+          <p>Tente palavras-chave diferentes ou confira nossos destaques na página inicial.</p>
+        </div>
+      {% endif %}
+    {% endif %}
+  </section>
+{% endpaginate %}

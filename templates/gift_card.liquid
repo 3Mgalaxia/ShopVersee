@@ -1,0 +1,17 @@
+{% layout 'theme' %}
+
+<section class="gift-card">
+  <div class="gift-card__content">
+    <h1>{{ 'gift_cards.issued.title' | t }}</h1>
+    <p>{{ 'gift_cards.issued.subtext' | t }}</p>
+
+    <div class="gift-card__code">
+      <strong>{{ gift_card.code | format_code }}</strong>
+      {% if gift_card.expires_on %}
+        <p>{{ 'gift_cards.issued.expires' | t: expiry: gift_card.expires_on | escape }}</p>
+      {% endif %}
+    </div>
+
+    <a class="btn primary" href="{{ routes.root_url }}">{{ 'layout.navigation.home' | t }}</a>
+  </div>
+</section>

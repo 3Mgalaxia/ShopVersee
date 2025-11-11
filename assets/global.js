@@ -1330,3 +1330,88 @@ class CartPerformance {
     );
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.product-gallery').forEach((gallery) => {
+    const slides = gallery.querySelectorAll('[data-gallery-slide]');
+    const thumbs = gallery.querySelectorAll('[data-gallery-thumb]');
+
+    if (!slides.length || !thumbs.length) return;
+
+    const activateSlide = (index) => {
+      slides.forEach((slide) => {
+        slide.classList.toggle('is-active', Number(slide.dataset.gallerySlide) === index);
+      });
+      thumbs.forEach((thumb) => {
+        thumb.classList.toggle('is-active', Number(thumb.dataset.galleryThumb) === index);
+      });
+    };
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        activateSlide(Number(thumb.dataset.galleryThumb));
+      });
+    });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const track = document.querySelector('.banner-showcase__track');
+  if (!track) return;
+
+  const slides = track.querySelectorAll('.banner-slide');
+  if (slides.length <= 1) return;
+
+  let currentIndex = 0;
+  let autoSliding = true;
+
+  const scrollToSlide = (index) => {
+    const target = slides[index];
+    if (!target) return;
+    track.scrollTo({
+      left: target.offsetLeft,
+      behavior: 'smooth',
+    });
+  };
+
+  const autoAdvanceInterval = setInterval(() => {
+    if (!autoSliding) return;
+    currentIndex = (currentIndex + 1) % slides.length;
+    scrollToSlide(currentIndex);
+  }, 7000);
+
+  const stopAutoSliding = () => {
+    if (!autoSliding) return;
+    autoSliding = false;
+    clearInterval(autoAdvanceInterval);
+  };
+
+  ['pointerdown', 'touchstart', 'wheel'].forEach((eventName) => {
+    track.addEventListener(eventName, stopAutoSliding, { once: true, passive: true });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dropdowns = document.querySelectorAll('.shopversee-header__icons details');
+  if (!dropdowns.length) return;
+
+  const closeOthers = (current) => {
+    dropdowns.forEach((detail) => {
+      if (detail !== current) detail.removeAttribute('open');
+    });
+  };
+
+  dropdowns.forEach((detail) => {
+    detail.addEventListener('toggle', () => {
+      if (detail.open) {
+        closeOthers(detail);
+      }
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.shopversee-header__icons')) {
+      dropdowns.forEach((detail) => detail.removeAttribute('open'));
+    }
+  });
+});

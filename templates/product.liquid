@@ -1,0 +1,258 @@
+{% section 'header' %}
+
+<article class="product-page">
+  <div class="product-page__grid">
+    <div class="product-gallery">
+      <div class="product-gallery__featured">
+        {% if product.media.size > 0 %}
+          {% for media in product.media %}
+            <div
+              class="product-gallery__slide{% if forloop.first %} is-active{% endif %}"
+              data-gallery-slide="{{ forloop.index0 }}"
+            >
+              {% case media.media_type %}
+                {% when 'image' %}
+                  {{ media | image_url: width: 1200 | image_tag: class: 'product-gallery__image', loading: 'lazy', alt: media.alt | default: product.title }}
+                {% when 'external_video', 'video' %}
+                  {{ media | external_video_tag: class: 'product-gallery__video' }}
+                {% else %}
+                  {{ media | media_tag }}
+              {% endcase %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="product-gallery__placeholder">Sem imagens para este produto.</div>
+        {% endif %}
+      </div>
+
+      {% if product.media.size > 1 %}
+        <div class="product-gallery__thumbs" role="list">
+          {% for media in product.media %}
+            <button
+              class="product-thumb{% if forloop.first %} is-active{% endif %}"
+              data-gallery-thumb="{{ forloop.index0 }}"
+              type="button"
+            >
+              {% if media.preview_image %}
+                {{ media.preview_image | image_url: width: 200 | image_tag: loading: 'lazy', alt: media.alt | default: product.title }}
+              {% endif %}
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="product-info">
+      <p class="badge">Coleção interestelar</p>
+      <h1>{{ product.title }}</h1>
+      <div class="product-price">
+        <span class="product-price__current">
+          {{ product.selected_or_first_available_variant.price | money }}
+        </span>
+        {% if product.compare_at_price_max > product.price %}
+          <span class="product-price__compare">{{ product.compare_at_price_max | money }}</span>
+        {% endif %}
+      </div>
+      <p class="product-installments">
+        Parcelamos em até 12x de
+        {{ product.selected_or_first_available_variant.price | divided_by: 12.0 | money }}
+        sem juros.
+      </p>
+      <ul class="product-payment">
+        <li>Cartões principais</li>
+        <li>Pix instantâneo</li>
+        <li>Boleto bancário</li>
+      </ul>
+
+      <div class="product-form">
+        {% assign product_form_id = 'product-form-' | append: product.id %}
+        {% form 'product', product, id: product_form_id %}
+          <input type="hidden" name="return_to" value="/cart">
+          {% assign variant_input_id = 'product-variant-id-' | append: product.id %}
+          {% if product.has_only_default_variant %}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" id="{{ variant_input_id }}">
+          {% else %}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" id="{{ variant_input_id }}">
+            <div class="variant-picker" data-variant-picker data-product-id="{{ product.id }}" data-options-count="{{ product.options.size }}">
+              {% for option in product.options_with_values %}
+                <fieldset class="variant-picker__group" data-option-index="{{ forloop.index0 }}">
+                  <legend>{{ option.name }}</legend>
+                  <div class="variant-picker__pills">
+                    {% for value in option.values %}
+                      <button type="button" class="variant-pill{% if option.selected_value == value %} is-active{% endif %}" data-value="{{ value }}">
+                        {{ value }}
+                      </button>
+                    {% endfor %}
+                  </div>
+                </fieldset>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <label class="sr-only" for="product-quantity">Quantidade</label>
+          <input
+            id="product-quantity"
+            class="product-form__quantity"
+            type="number"
+            name="quantity"
+            min="1"
+            value="1"
+          >
+
+          <button
+            type="submit"
+            name="add"
+            class="btn primary product-form__submit"
+            {% unless product.available %}disabled{% endunless %}
+          >
+            Comprar agora
+          </button>
+        {% endform %}
+      </div>
+      {% unless product.has_only_default_variant %}
+        <script type="application/json" id="variants-data-{{ product.id }}">
+          {{ product.variants | json }}
+        </script>
+      {% endunless %}
+
+      <div class="product-description">
+        <h2>Descrição</h2>
+        <div class="product-description__content">
+          {{ product.description | default: 'Este produto ainda não possui uma descrição detalhada.' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+{% unless product.has_only_default_variant %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const picker = document.querySelector('[data-variant-picker][data-product-id="{{ product.id }}"]');
+      if (!picker) return;
+
+      const variantData = JSON.parse(document.getElementById('variants-data-{{ product.id }}').textContent);
+      const hiddenInput = document.getElementById('product-variant-id-{{ product.id }}');
+      const submitButton = picker.closest('product-form').querySelector('.product-form__submit');
+      const defaultText = submitButton.textContent.trim();
+      const groups = Array.from(picker.querySelectorAll('.variant-picker__group'));
+      const selections = groups.map((group) => group.querySelector('.variant-pill.is-active')?.dataset.value || null);
+
+      const updateVariant = () => {
+        const variant = variantData.find((variant) =>
+          variant.options.every((value, index) => value === selections[index])
+        );
+
+        if (!variant) {
+          hiddenInput.value = '';
+          submitButton.setAttribute('disabled', 'disabled');
+          submitButton.textContent = 'Indisponível';
+          return;
+        }
+
+        hiddenInput.value = variant.id;
+        if (variant.available) {
+          submitButton.removeAttribute('disabled');
+          submitButton.textContent = defaultText;
+        } else {
+          submitButton.setAttribute('disabled', 'disabled');
+          submitButton.textContent = 'Esgotado';
+        }
+      };
+
+      groups.forEach((group, index) => {
+        group.addEventListener('click', (event) => {
+          const pill = event.target.closest('.variant-pill');
+          if (!pill) return;
+          event.preventDefault();
+          group.querySelectorAll('.variant-pill').forEach((btn) => btn.classList.remove('is-active'));
+          pill.classList.add('is-active');
+          selections[index] = pill.dataset.value;
+          updateVariant();
+        });
+      });
+
+      updateVariant();
+    });
+  </script>
+{% endunless %}
+
+{% assign related_collection = collections['frontpage'] %}
+{% if product.collections.first %}
+  {% assign related_collection = product.collections.first %}
+{% endif %}
+{% assign product_terms = product.title | downcase | split: ' ' %}
+
+{% if related_collection %}
+  <section class="section-block recommendations" id="relacionados">
+    <div class="section-block__header">
+      <p class="section-block__eyebrow">Sugestões para você</p>
+      <h2>Combina com este produto</h2>
+      <p class="section-block__lead">
+        Itens selecionados automaticamente dentro da coleção Página inicial e com nomes semelhantes ao produto.
+      </p>
+    </div>
+    <div class="product-grid">
+      {% assign counter = 0 %}
+      {% assign rendered_ids = '' %}
+      {% for related_product in related_collection.products %}
+        {% if related_product.id != product.id and counter < 4 %}
+          {% assign related_title = related_product.title | downcase %}
+          {% assign has_match = false %}
+          {% for term in product_terms %}
+            {% assign clean_term = term | strip %}
+            {% if clean_term.size > 2 and related_title contains clean_term %}
+              {% assign has_match = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if has_match %}
+            {% assign counter = counter | plus: 1 %}
+            {% capture rendered_ids %}{{ rendered_ids }}|{{ related_product.id }}|{% endcapture %}
+            <article class="product-card">
+              <a class="product-card__media" href="{{ related_product.url }}">
+                {% if related_product.featured_media %}
+                  {{ related_product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', alt: related_product.title }}
+                {% else %}
+                  <span class="product-card__placeholder">Pré-visualização</span>
+                {% endif %}
+              </a>
+              <div class="product-card__body">
+                <a href="{{ related_product.url }}"><h3>{{ related_product.title }}</h3></a>
+                <p class="product-card__price">{{ related_product.price | money }}</p>
+                <p>Parcelas em até 12x de {{ related_product.price | divided_by: 12.0 | money }}.</p>
+                <a class="btn ghost" href="{{ related_product.url }}">Ver detalhes</a>
+              </div>
+            </article>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% if counter < 4 %}
+        {% for related_product in related_collection.products %}
+          {% if related_product.id != product.id and counter < 4 %}
+            {% assign id_marker = '|' | append: related_product.id | append: '|' %}
+            {% unless rendered_ids contains id_marker %}
+              {% assign counter = counter | plus: 1 %}
+              <article class="product-card">
+                <a class="product-card__media" href="{{ related_product.url }}">
+                  {% if related_product.featured_media %}
+                    {{ related_product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', alt: related_product.title }}
+                  {% else %}
+                    <span class="product-card__placeholder">Pré-visualização</span>
+                  {% endif %}
+                </a>
+                <div class="product-card__body">
+                  <a href="{{ related_product.url }}"><h3>{{ related_product.title }}</h3></a>
+                  <p class="product-card__price">{{ related_product.price | money }}</p>
+                  <p>Parcelas em até 12x de {{ related_product.price | divided_by: 12.0 | money }}.</p>
+                  <a class="btn ghost" href="{{ related_product.url }}">Ver detalhes</a>
+                </div>
+              </article>
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </section>
+{% endif %}

@@ -1,0 +1,45 @@
+{% layout none %}
+
+<div id="predictive-search-results-groups-wrapper">
+  {% if predictive_search.performed and predictive_search.resources.products.size > 0 %}
+    <ul
+      class="predictive-search__results-list"
+      id="predictive-search-results-list"
+      role="listbox"
+      aria-label="Produtos sugeridos"
+    >
+      {% for product in predictive_search.resources.products %}
+        <li
+          id="predictive-search-option-product-{{ forloop.index }}"
+          class="predictive-search__item"
+          role="option"
+          aria-selected="false"
+        >
+          <a class="predictive-search__item-link" href="{{ product.url }}">
+            <span class="predictive-search__item-image">
+              {% if product.featured_media %}
+                {{ product.featured_media | image_url: width: 120 | image_tag: loading: 'lazy', alt: product.title }}
+              {% else %}
+                <span class="predictive-search__item-placeholder">Preview</span>
+              {% endif %}
+            </span>
+            <span class="predictive-search__item-copy">
+              <span class="predictive-search__item-title">{{ product.title }}</span>
+              <span class="predictive-search__item-price">{{ product.price | money }}</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="predictive-search__empty">Nenhum produto encontrado.</p>
+  {% endif %}
+</div>
+
+<div class="sr-only" data-predictive-search-live-region-count-value>
+  {% if predictive_search.performed and predictive_search.resources.products.size > 0 %}
+    {{ predictive_search.resources.products.size }} produtos sugeridos
+  {% else %}
+    Nenhum produto encontrado
+  {% endif %}
+</div>

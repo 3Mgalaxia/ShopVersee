@@ -1,24 +1,91 @@
-<header class="shopversee-header" role="banner">
-  <a class="shopversee-header__brand" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
-    {{ shop.name | default: 'ShopVersee' }}
+<header class="shopversee-header section-header" role="banner">
+  <a class="shopversee-header__brand" href="{{ routes.root_url }}" aria-label="ShopVerse">
+    ShopVerse
   </a>
 
   <nav class="shopversee-header__nav" aria-label="Navegação principal">
-    <a href="#inicio">Início</a>
-    <a href="#banners">Banners</a>
-    <a href="#produtos">Produtos</a>
-    <a href="#conta">Conta</a>
+    <a href="{{ routes.root_url }}">Início</a>
+    <a href="{{ routes.all_products_collection_url }}">Produtos</a>
+    <a href="#contato">Contato</a>
+    <a href="#sobre">Sobre nós</a>
   </nav>
 
-  <a class="shopversee-header__account" href="{{ routes.account_url }}" aria-label="Área do cliente">
-    <img
-      src="{{ 'icon-account.svg' | asset_url }}"
-      alt=""
-      role="presentation"
-      width="20"
-      height="20"
-      loading="lazy"
-    >
-    <span>Minha conta</span>
-  </a>
+  <div class="shopversee-header__icons" aria-label="Ações rápidas">
+    <details class="search-dropdown">
+      <summary class="icon-button icon-button--search" aria-haspopup="dialog" aria-label="Abrir busca">
+        <img
+          src="{{ 'icon-zoom.svg' | asset_url }}"
+          alt=""
+          role="presentation"
+          width="32"
+          height="32"
+          loading="lazy"
+        >
+      </summary>
+      <div class="search-dropdown__panel">
+        <predictive-search class="predictive-search" data-loading-text="Buscando produtos...">
+          <form class="predictive-search__form" action="{{ routes.search_url }}" method="get" role="search">
+            <label class="sr-only" for="SearchInput-header">Buscar produtos</label>
+            <span class="predictive-search__icon" aria-hidden="true">
+              <img src="{{ 'icon-zoom.svg' | asset_url }}" alt="">
+            </span>
+            <input
+              id="SearchInput-header"
+              type="search"
+              name="q"
+              placeholder="Pesquisar produtos"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              aria-expanded="false"
+              role="combobox"
+              aria-owns="predictive-search-results-list"
+            >
+            <input type="hidden" name="type" value="product">
+            <button type="submit" class="predictive-search__submit">Buscar</button>
+            <button type="reset" class="predictive-search__reset hidden">Limpar</button>
+          </form>
+          <div class="predictive-search-status sr-only" aria-live="polite" role="status" aria-hidden="true"></div>
+          <div class="predictive-search__results" data-predictive-search></div>
+        </predictive-search>
+      </div>
+    </details>
+
+    <details class="account-dropdown">
+      <summary class="icon-button icon-button--account" aria-haspopup="dialog" aria-label="Abrir painel da conta">
+        <img
+          src="{{ 'icon-account.svg' | asset_url }}"
+          alt=""
+          role="presentation"
+          width="32"
+          height="32"
+          loading="lazy"
+        >
+      </summary>
+      <div class="account-dropdown__panel">
+        <p class="account-dropdown__title">Entre com sua conta</p>
+        <div class="account-dropdown__cta">
+          <p>Acesse o painel completo para acompanhar pedidos e personalizar sua experiência.</p>
+          <a class="btn primary" href="{{ routes.account_login_url }}">Entrar</a>
+          <a class="btn ghost" href="{{ routes.account_register_url }}">Criar nova conta</a>
+          <a class="account-dropdown__recover" href="{{ routes.account_login_url }}#recover">Esqueci minha senha</a>
+        </div>
+      </div>
+    </details>
+
+    <a class="icon-button icon-button--cart" href="{{ routes.cart_url }}" aria-label="Abrir carrinho">
+      <img
+        src="{{ 'icon-cart.svg' | asset_url }}"
+        alt=""
+        role="presentation"
+        width="40"
+        height="40"
+        loading="lazy"
+      >
+      {% if cart != empty and cart.item_count > 0 %}
+        <span class="icon-button__badge">{{ cart.item_count }}</span>
+      {% endif %}
+    </a>
+  </div>
 </header>

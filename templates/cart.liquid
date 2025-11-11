@@ -1,0 +1,99 @@
+{% section 'header' %}
+
+<section class="cart-page">
+  <div class="cart-page__backdrop" aria-hidden="true">
+    <span class="cart-star cart-star--one"></span>
+    <span class="cart-star cart-star--two"></span>
+    <span class="cart-star cart-star--three"></span>
+    <span class="cart-star cart-star--four"></span>
+    <span class="cart-star cart-star--five"></span>
+    <span class="cart-star cart-star--six"></span>
+    <span class="cart-star cart-star--seven"></span>
+    <span class="cart-star cart-star--eight"></span>
+    <span class="cart-star cart-star--nine"></span>
+    <span class="cart-meteor cart-meteor--one"></span>
+    <span class="cart-meteor cart-meteor--two"></span>
+  </div>
+
+  <div class="cart-shell">
+    <div class="cart-shell__header">
+      <p class="badge">Carrinho intergaláctico</p>
+      <h1>Produtos em órbita</h1>
+      {% if cart.item_count > 0 %}
+        <p class="cart-shell__subtitle">
+          Você tem {{ cart.item_count }} item{% if cart.item_count > 1 %}s{% endif %} pronto{% if cart.item_count > 1 %}s{% endif %} para o hiperenvio.
+        </p>
+      {% else %}
+        <p class="cart-shell__subtitle">Seu carrinho está vazio. Que tal explorar nossa vitrine estelar?</p>
+      {% endif %}
+    </div>
+
+    {% if cart.item_count > 0 %}
+      <div class="cart-grid">
+        <form id="cart-items-form" class="cart-items" action="{{ routes.cart_url }}" method="post" novalidate>
+          {% for item in cart.items %}
+            <article class="cart-item">
+              <a class="cart-item__media" href="{{ item.url }}">
+                {% if item.image %}
+                  {{ item.image | image_url: width: 400 | image_tag: loading: 'lazy', alt: item.title }}
+                {% else %}
+                  <span class="cart-item__placeholder">Sem imagem</span>
+                {% endif %}
+              </a>
+              <div class="cart-item__body">
+                <a href="{{ item.url }}"><h2>{{ item.product.title }}</h2></a>
+                {% if item.variant_title != 'Default Title' %}
+                  <p class="cart-item__variant">{{ item.variant_title }}</p>
+                {% endif %}
+                <p class="cart-item__price">{{ item.final_line_price | money }}</p>
+                <div class="cart-item__controls">
+                  <label class="sr-only" for="quantity-{{ forloop.index }}">Quantidade</label>
+                  <input
+                    class="cart-item__quantity"
+                    id="quantity-{{ forloop.index }}"
+                    type="number"
+                    min="0"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                  >
+                  <a
+                    class="cart-item__remove"
+                    href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity=0"
+                  >
+                    Remover
+                  </a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+          <div class="cart-items__actions">
+            <button class="btn ghost" type="submit" name="update">Atualizar carrinho</button>
+          </div>
+        </form>
+
+        <aside class="cart-summary">
+          <div class="cart-summary__block">
+            <p>Total</p>
+            <strong>{{ cart.total_price | money }}</strong>
+          </div>
+          <p class="cart-summary__installments">
+            Em até 12x de {{ cart.total_price | divided_by: 12.0 | money }} sem juros.
+          </p>
+          <ul class="cart-summary__payments">
+            <li>Cartões principais</li>
+            <li>Pix instantâneo</li>
+            <li>Boleto bancário</li>
+          </ul>
+          <button class="btn primary cart-summary__checkout" type="submit" name="checkout" form="cart-items-form">
+            Finalizar compra
+          </button>
+        </aside>
+      </div>
+    {% else %}
+      <div class="cart-empty">
+        <p>Ops! Nenhum item no momento.</p>
+        <a class="btn primary" href="{{ routes.root_url }}">Voltar às compras</a>
+      </div>
+    {% endif %}
+  </div>
+</section>

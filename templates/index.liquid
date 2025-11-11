@@ -1,42 +1,59 @@
 {% section 'header' %}
 
 <section class="page-shell" id="inicio">
+  <section class="banner-showcase" aria-label="Campanhas ShopVerse">
+    <div class="banner-showcase__track">
+      <figure class="banner-slide">
+        <img
+          src="{{ 'Banner-SHOPVERSE.png' | asset_url }}"
+          alt="Coleções ShopVerse em destaque"
+          loading="lazy"
+        >
+      </figure>
+      <figure class="banner-slide">
+        <img
+          src="{{ 'Banner-SHOPVERSE-CELULAR.png' | asset_url }}"
+          alt="Novidades ShopVerse para dispositivos móveis"
+          loading="lazy"
+        >
+      </figure>
+    </div>
+  </section>
+
   <main class="hero" aria-label="Boas-vindas ao ShopVersee">
     <p class="badge">
       {{ settings.hero_badge | default: 'Explorando o cosmos do e-commerce' }}
     </p>
-    <h1>{{ settings.hero_headline | default: 'ShopVersee' }}</h1>
+    <h1>{{ settings.hero_headline | default: 'ShopVerse' }}</h1>
     <p class="lead">
       {{ settings.hero_copy | default: 'Uma nova experiência intergaláctica para conectar marcas e pessoas que vivem sem fronteiras.' }}
     </p>
     <div class="actions">
-      <a class="btn primary" href="#produtos">Começar</a>
-      <a class="btn ghost" href="#banners">Saber mais</a>
+      <a class="btn primary" href="{{ routes.all_products_collection_url }}">Ver produtos</a>
+      <a class="btn ghost" href="#sobre">Sobre nós</a>
     </div>
   </main>
 </section>
 
-<section id="banners" class="section-block">
+{% assign category_banners = "Banner-1.png|Casa,Banner-2.png|Gourmet,Banner-3.png|Segurança,Banner-4.png|Bem-estar,Banner-5.png|Tecnologia,Banner-6.png|Lazer,Banner-7.png|Imersão,Banner-8.png|Automotivo,Banner-9.png|Pet" | split: "," %}
+<section class="category-showcase" aria-label="Categorias ShopVerse">
   <div class="section-block__header">
-    <p class="section-block__eyebrow">Campanhas em destaque</p>
-    <h2>Banner intergaláctico</h2>
+    <p class="section-block__eyebrow">Categorias</p>
+    <h2>Explore universos por interesse</h2>
     <p class="section-block__lead">
-      Destaque coleções com chamadas rápidas. Substitua estas mensagens pelos banners reais da sua operação.
+      Cada banner leva você a uma atmosfera diferente da ShopVerse. Escolha o mood e continue a jornada.
     </p>
   </div>
-  <div class="banner-grid">
-    <article class="banner-card banner-card--nova">
-      <p class="banner-card__eyebrow">Coleção Nebulosa</p>
-      <h3>Moda que brilha em qualquer órbita</h3>
-      <p>Peças metálicas e tecidos leves para quem vive em movimento.</p>
-      <a href="#produtos" class="btn ghost">Ver coleção</a>
-    </article>
-    <article class="banner-card banner-card--pulse">
-      <p class="banner-card__eyebrow">Tech essenciais</p>
-      <h3>Equipamentos com energia estelar</h3>
-      <p>Gadgets com inteligência artificial e autonomia prolongada.</p>
-      <a href="#produtos" class="btn primary">Comprar agora</a>
-    </article>
+  <div class="category-grid">
+    {% for banner in category_banners %}
+      {% assign parts = banner | split: "|" %}
+      <article class="category-card">
+        <img src="{{ parts[0] | asset_url }}" alt="Categoria {{ parts[1] }}" loading="lazy">
+        <div class="category-card__body">
+          <p>{{ parts[1] }}</p>
+        </div>
+      </article>
+    {% endfor %}
   </div>
 </section>
 
@@ -48,7 +65,8 @@
   </div>
   <div class="product-grid">
     {% if featured_collection and featured_collection.products_count > 0 %}
-      {% for product in featured_collection.products limit: 4 %}
+      {% assign sorted_products = featured_collection.products | sort: 'title' %}
+      {% for product in sorted_products limit: 50 %}
         <article class="product-card">
           <a class="product-card__media" href="{{ product.url }}">
             {% if product.featured_image %}
@@ -84,24 +102,67 @@
   </div>
 </section>
 
-<section id="conta" class="section-block">
+<section id="sobre" class="section-block about-block">
+  <div class="section-block__header">
+    <p class="section-block__eyebrow">Sobre nós</p>
+    <h2>Uma constelação chamada ShopVerse</h2>
+    <p class="section-block__lead">
+      Somos um marketplace brasileiro apaixonado por experiências futuristas e produtos que elevam o cotidiano. Do
+      vestuário às soluções tech, conectamos marcas independentes e criadores visionários em um só universo.
+    </p>
+  </div>
+  <div class="about-grid">
+    <article class="about-card">
+      <p class="about-card__eyebrow">Missão</p>
+      <h3>Explorar novas formas de consumo</h3>
+      <p>
+        Curadoria humana, tecnologia e impacto positivo para entregar coleções que merecem orbitar a sua rotina.
+      </p>
+    </article>
+    <article class="about-card">
+      <p class="about-card__eyebrow">Visão</p>
+      <h3>Comunidade sem fronteiras</h3>
+      <p>
+        Criamos pontes entre pessoas, marcas e causas para que cada compra represente um passo consciente no espaço.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section id="contato" class="section-block">
   <div class="account-card">
     <div class="account-card__media">
       <img
-        src="{{ 'icon-account.svg' | asset_url }}"
-        alt="Ícone de conta"
-        width="48"
-        height="48"
+        src="{{ 'icon-chat-bubble.svg' | asset_url }}"
+        alt="Ícone de contato"
+        width="64"
+        height="64"
         loading="lazy"
       >
     </div>
     <div class="account-card__body">
-      <h2>Gerencie sua conta</h2>
-      <p>Acompanhe pedidos, liste favoritos e atualize seus dados em um só lugar.</p>
+      <h2>Fale com a ShopVerse</h2>
+      <p>Estamos prontos para tirar dúvidas, sugerir combinações e acelerar a sua próxima compra.</p>
       <div class="actions">
-        <a class="btn primary" href="{{ routes.account_url }}">Entrar</a>
-        <a class="btn ghost" href="{{ routes.account_register_url }}">Criar conta</a>
+        <a class="btn primary" href="mailto:{{ shop.email }}">Enviar e-mail</a>
+        <a class="btn ghost" href="{{ routes.account_url }}">Área do cliente</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="hire-cta" aria-label="Projetos sob demanda">
+  <div class="hire-cta__content">
+    <p class="hire-cta__eyebrow">Projetos sob medida</p>
+    <h2>Transforme sua visão em uma experiência digna da ShopVerse</h2>
+    <p>
+      Construo lojas completas com identidade, animações e integrações robustas, prontas para converter. Seja para lançar
+      uma nova ShopVerse ou destacar o seu próprio segmento, podemos desenhar uma presença digital intergaláctica e
+      totalmente alinhada ao seu negócio.
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="mailto:{{ shop.email }}?subject=Quero%20um%20site%20intergal%C3%A1tico">Falar comigo</a>
+      <a class="btn ghost" href="{{ routes.contact_url }}">Ver canais</a>
     </div>
   </div>
 </section>
