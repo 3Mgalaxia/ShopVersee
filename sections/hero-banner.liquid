@@ -1,0 +1,53 @@
+{% comment %}
+  Seção personalizada da ShopVerse – visível no editor da Shopify
+{% endcomment %}
+
+<section class="hero-banner" style="background-image: url({{ section.settings.bg_image | image_url }})">
+  <div class="overlay"></div>
+  <div class="content">
+    <h1>{{ section.settings.title }}</h1>
+    <p>{{ section.settings.subtitle }}</p>
+    <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_text }}</a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero ShopVerse",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Imagem de fundo"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título principal",
+      "default": "Explore o universo ShopVerse"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Tecnologia e estilo sem fronteiras"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link do botão"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto do botão",
+      "default": "Comprar agora"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Seção ShopVerse Hero"
+    }
+  ]
+}
+{% endschema %}

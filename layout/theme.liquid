@@ -6,8 +6,10 @@
     <title>{{ page_title }} · {{ shop.name }}</title>
     {{ content_for_header }}
     {{ 'style.css' | asset_url | stylesheet_tag }}
+    {{ 'custom-shopverse.css' | asset_url | stylesheet_tag }}
+    {{ 'responsive.css' | asset_url | stylesheet_tag }}
   </head>
-  <body>
+  <body class="template-{{ template.name | handle }}">
     <div class="app-frame">
       {{ content_for_layout }}
     </div>
